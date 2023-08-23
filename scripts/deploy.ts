@@ -10,7 +10,7 @@ async function main() {
   // const lockedAmount = ethers.parseEther("0.001");
   // const [owner] = await ethers.getSigners()
 
-  const Storage = await ethers.deployContract("OrganizationProxy");
+  const Storage = await ethers.deployContract("InsurancePoolFactory");
 
   const storageInstance = await Storage.waitForDeployment();
 
