@@ -9,15 +9,17 @@ export function AuthSection() {
   const { status, isConnected, address } = useAccount();
   const [canShow, setCanShow] = useState<boolean>(false);
 
-  useEffect(() => setCanShow(true), []);
+  useEffect(() => {
+    setCanShow(true);
+  }, []);
 
   return (
     <>
-      <h2>Storage Frontend</h2>
+      <h2>Insurance Frontend</h2>
       <br />
       <Button onClick={() => open()}>Connect Wallet</Button>
       <br />
-      {canShow && (
+      {canShow ? (
         <>
           <p>
             <span className="font-bold">Wallet Status</span> {status}
@@ -26,6 +28,8 @@ export function AuthSection() {
             <span className="font-bold">Address</span> {isConnected && address}
           </p>
         </>
+      ) : (
+        "Loading..."
       )}
     </>
   );

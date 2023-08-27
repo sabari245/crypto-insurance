@@ -18,6 +18,8 @@ contract InsurancePool {
     mapping(address => Client) public clients;
 
     function payMonthlyPremium(address _client) external payable {
+        console.log(clients[_client].validEnd);
+        console.log(block.timestamp);
         require(
             block.timestamp >= clients[_client].validEnd,
             "1 month has not passed since last payment"
@@ -81,12 +83,17 @@ contract InsurancePoolFactory {
     function createInsurancePool(uint _premium) external {
         InsurancePool newPool = new InsurancePool(_premium);
         insurancePools[msg.sender] = newPool;
-        insurancePoolAddresses.push(address(newPool));
+        insurancePoolAddresses.push(msg.sender);
     }
 
     function getInsurancePools(
         uint _fromIndex
     ) external view returns (address[] memory) {
+        if (insurancePoolAddresses.length == 0) {
+            address[] memory emptyArray = new address[](0);
+            return emptyArray;
+        }
+
         require(_fromIndex < insurancePoolAddresses.length, "Invalid index");
 
         uint endIndex = _fromIndex + 5;

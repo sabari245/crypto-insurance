@@ -12,7 +12,14 @@ import {
 } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { arbitrum, mainnet, polygon, localhost, Chain } from "wagmi/chains";
+import {
+  arbitrum,
+  mainnet,
+  polygon,
+  localhost,
+  Chain,
+  sepolia,
+} from "wagmi/chains";
 
 const localnet: Chain = {
   id: 31337,
@@ -34,7 +41,7 @@ const localnet: Chain = {
 };
 
 // wallet configuration
-const chains = [arbitrum, mainnet, polygon, localhost, localnet];
+const chains = [arbitrum, mainnet, polygon, localhost, localnet, sepolia];
 const projectId = "78628cff4fa32f8236bacc8bdec91e4a";
 
 const { publicClient } = configureChains(chains, [w3mProvider({ projectId })]);

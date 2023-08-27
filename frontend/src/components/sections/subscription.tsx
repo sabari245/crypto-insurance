@@ -4,68 +4,97 @@ import { usePublicClient, useWalletClient } from "wagmi";
 import data from "../interface.json";
 import { useEffect, useState } from "react";
 
-export default function PoolCreateSection() {
+interface SubscriptionSectionProps {
+  premiumPrice: number | undefined;
+  currentPool: string | undefined;
+}
+export default function SubscriptionSection(props: SubscriptionSectionProps) {
   const [value, setValue] = useState<number>();
 
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  //   async function payMonthlyPremium(_pool, _value) {
-  //     if (!walletClient) {
-  //       console.log("wallets not connected");
-  //       return;
-  //     }
+  async function payMonthlyPremium() {
+    if (!walletClient || !props.currentPool || !props.premiumPrice) {
+      console.log("wallets not connected");
+      return;
+    }
 
-  //     const [address] = await walletClient.getAddresses();
+    let _value = props.premiumPrice;
 
-  //     const { request } = await publicClient.simulateContract({
-  //       abi: data.abi,
-  //       address: `0x${data.address.substring(2)}`,
-  //       functionName: "payMonthlyPremium",
-  //       args: [_pool],
-  //       account: address,
-  //       value: _value,
-  //     });
+    const [address] = await walletClient.getAddresses();
 
-  //     const hash = await walletClient.writeContract(request);
-  //   }
+    const { request } = await publicClient.simulateContract({
+      abi: data.abi,
+      address: `0x${data.address.substring(2)}`,
+      functionName: "payMonthlyPremium",
+      args: [props.currentPool],
+      account: address,
+      value: BigInt(_value),
+    });
 
-  //   async function payYearlyPremium(_pool, _value) {
-  //     if (!walletClient) {
-  //       console.log("wallets not connected");
-  //       return;
-  //     }
+    const hash = await walletClient.writeContract(request);
+  }
 
-  //     const [address] = await walletClient.getAddresses();
+  async function payYearlyPremium() {
+    if (!walletClient || !props.currentPool || !props.premiumPrice) {
+      console.log("wallets not connected");
+      return;
+    }
 
-  //     const { request } = await publicClient.simulateContract({
-  //       abi: data.abi,
-  //       address: `0x${data.address.substring(2)}`,
-  //       functionName: "payYearlyPremium",
-  //       args: [_pool],
-  //       account: address,
-  //       value: _value,
-  //     });
+    let _value = (props.premiumPrice * 12 * 10) / 9;
 
-  //     const hash = await walletClient.writeContract(request);
-  //   }
+    const [address] = await walletClient.getAddresses();
+
+    const { request } = await publicClient.simulateContract({
+      abi: data.abi,
+      address: `0x${data.address.substring(2)}`,
+      functionName: "payYearlyPremium",
+      args: [props.currentPool],
+      account: address,
+      value: BigInt(_value),
+    });
+
+    const hash = await walletClient.writeContract(request);
+  }
+
+  async function claimInsurance() {
+    if (!walletClient || !props.currentPool) {
+      console.log("wallets not connected");
+      return;
+    }
+
+    const [address] = await walletClient.getAddresses();
+
+    const { request } = await publicClient.simulateContract({
+      abi: data.abi,
+      address: `0x${data.address.substring(2)}`,
+      functionName: "claimInsurance",
+      args: [props.currentPool, value],
+      account: address,
+    });
+
+    const hash = await walletClient.writeContract(request);
+  }
 
   return (
     <>
-      <p>Subscription & Claim</p>
+      <p className="text-xl font-medium">Subscription & Claim</p>
       <br />
-      <Button onClick={() => {}}>Pay monthly premium</Button>
-      <br />
-      <Button onClick={() => {}}>Pay yearly premium</Button>
-      <br />
-      <Input
-        value={value}
-        onChange={(e) => setValue(parseInt(e.target.value))}
-        placeholder="Enter the amount to claim"
-        type="number"
-      />
-      <br />
-      <Button onClick={() => {}}>Claim Insurance</Button>
+      <div className="flex gap-3 mb-6">
+        <Button onClick={payMonthlyPremium}>Pay monthly premium</Button>
+        <Button onClick={payYearlyPremium}>Pay yearly premium</Button>
+      </div>
+      <div className="flex gap-3">
+        <Input
+          className="max-w-xs"
+          value={value}
+          onChange={(e) => setValue(parseInt(e.target.value))}
+          placeholder="Enter the amount to claim"
+          type="number"
+        />
+        <Button onClick={claimInsurance}>Claim</Button>
+      </div>
     </>
   );
 }

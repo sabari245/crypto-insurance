@@ -4,12 +4,6 @@ import { writeFileSync } from "fs"
 const OUTPUT_FILE = "./frontend/src/components/interface.json"
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
-
-  // const lockedAmount = ethers.parseEther("0.001");
-  // const [owner] = await ethers.getSigners()
-
   const Storage = await ethers.deployContract("InsurancePoolFactory");
 
   const storageInstance = await Storage.waitForDeployment();
@@ -20,11 +14,22 @@ async function main() {
   }
 
   writeFileSync(OUTPUT_FILE, JSON.stringify(data));
-
-  console.log(
-    `Lock with ETH and unlock timestamp ${unlockTime} deployed to ${Storage.target}`
-  );
   console.log(`the address and the abi is stored in: \n\t${OUTPUT_FILE}`)
+
+
+  const InsuranceFactory = await ethers.getContractFactory("InsuranceFactory");
+  const insuranceFactory = await InsuranceFactory.deploy();
+
+  const insuranceFactoryInstance = await insuranceFactory.waitForDeployment();
+
+  const data2 = {
+    address: await insuranceFactoryInstance.getAddress(),
+    abi: JSON.parse(insuranceFactoryInstance.interface.formatJson())
+  }
+
+  writeFileSync("./frontend/src/components/interface2.json", JSON.stringify(data2));
+  console.log(`the address and the abi is stored in: \n\t./frontend/src/components/interface2.json`)
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
